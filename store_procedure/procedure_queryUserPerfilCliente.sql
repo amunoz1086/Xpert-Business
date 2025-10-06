@@ -1,0 +1,10 @@
+DELIMITER $$
+CREATE PROCEDURE queryUserPerfilCliente(IN LOGIN CHAR(15))
+BEGIN
+	SELECT COD_PERF_CLIENTE
+	FROM usuario
+	WHERE USUARIO = LOGIN;
+END$$
+DELIMITER ;
+DROP PROCEDURE queryUserPerfilCliente;
+CALL queryUserPerfilCliente('mapo1982');

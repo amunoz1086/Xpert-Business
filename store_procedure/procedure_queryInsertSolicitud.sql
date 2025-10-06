@@ -1,0 +1,12 @@
+-- stored procedure queryInsertSolicitud
+DELIMITER $$
+	CREATE PROCEDURE queryInsertSolicitud (IN NIT CHAR(15), DATOS LONGTEXT, USU CHAR(15), APROBACIONES INT)
+		BEGIN
+			INSERT INTO solicitudes (NIT_CLIENTE, DATOS_SOLICITUD, ID_RADICADOR, APROREQUERIDAS)
+			VALUES (NIT, DATOS, USU, APROBACIONES);
+            SELECT MAX(COD_SOLICITUD) AS SOLICITUD  FROM solicitudes;
+		END$$
+DELIMITER ;
+
+DROP PROCEDURE queryInsertSolicitud;
+CALL queryInsertSolicitud(?, ?, ?, ?);

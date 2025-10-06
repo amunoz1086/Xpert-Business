@@ -1,0 +1,14 @@
+-- stored procedure loginUser v1
+DELIMITER $$
+	CREATE PROCEDURE queriLoginUsuario (IN LOGIN VARCHAR(45))
+		BEGIN
+			SELECT USU.USUARIO, USU.CORREO, PER.PERFIL, PRU.COD_PERFIL
+			FROM usuario AS USU
+			JOIN perfiles_usuario AS PRU ON USU.USUARIO = PRU.USUARIO
+			JOIN perfiles AS PER ON PRU.COD_PERFIL = PER.COD_PERFIL
+			WHERE USU.USUARIO = LOGIN;
+		END$$
+DELIMITER ;
+
+DROP PROCEDURE queriLoginUsuario;
+CALL queriLoginUsuario('usu1011');

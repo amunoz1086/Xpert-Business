@@ -1,0 +1,62 @@
+{
+  "name": "apbancaemp-app",
+  "version": "1.1.29A",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.657.0",
+    "@aws-sdk/lib-storage": "^3.717.0",
+    "@heroicons/react": "^2.1.5",
+    "@react-pdf/renderer": "3.1.15",
+    "archiver": "^7.0.1",
+    "ip": "^2.0.1",
+    "jose": "^5.4.1",
+    "mysql2": "^3.9.8",
+    "net": "^1.0.2",
+    "next": "^14.2.21",
+    "nodemailer": "^6.9.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.2.1",
+    "tls": "^0.0.1",
+    "xml2js": "^0.6.2"
+  },
+  "scripts": {
+    "dev": "next dev --experimental-https",
+    "build": "next build",
+    "start": "next start",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "next lint"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "20.10.5",
+    "@types/react": "18.2.45",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0"
+  },
+  "overrides": {
+    "@react-pdf/layout": "3.6.4",
+    "@react-pdf/textkit": "4.2.1"
+  },
+  "description": "node pricing",
+  "main": "postcss.config.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Want_n_get",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}

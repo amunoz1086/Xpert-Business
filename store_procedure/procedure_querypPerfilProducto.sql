@@ -1,0 +1,10 @@
+DELIMITER $$
+	DROP PROCEDURE IF EXISTS queryPerfilProducto;
+	CREATE PROCEDURE queryPerfilProducto(IN USU VARCHAR(15))
+		BEGIN
+			SELECT COD_PERF_PRODUCTO FROM usuario
+			WHERE USUARIO = USU;
+		END$$
+DELIMITER ;
+
+CALL queryPerfilProducto(?);

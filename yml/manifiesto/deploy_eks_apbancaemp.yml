@@ -1,0 +1,535 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: banca-comercial
+  name: apbancaemp
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: apbancaemp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: apbancaemp
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - image: 618817091491.dkr.ecr.us-east-1.amazonaws.com/apbancaemp:1.1.29A
+        name: apbancaemp
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: #New
+          limits:
+            cpu: "2"
+            memory: "256Mi"
+          requests:
+            cpu: "0.5"
+            memory: "50Mi"
+        env:
+        - name: DB_USER_MYSQL #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: usuario_aurora
+        - name: DB_PASS_MYSQL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: password_aurora
+        - name: DB_HOST_MYSQL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_aurora
+        - name: DB_NAME_MYSQL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: nombre_bd_aurora
+        - name: DB_PORT_MYSQL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_bd_aurora
+        - name: PORT # Puerto de despliegue app
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_despliegue
+        - name: SQUEMA_AURORA ##
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: squema_aurora
+        - name: KEY_SECRET #AUTH APP
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: auth_app
+        - name: AUT_COGNITO_USU #AUTH SERVICIOS
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: auth_cognito_usu
+        - name: AUT_COGNITO_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: auth_cognito_pass
+        - name: MAIL_HOST #EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_mail
+        - name: MAIL_PORT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_mail
+        - name: MAIL_SECURE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: ssl_tls_mail
+        - name: MAIL_USER
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: usuario_mail
+        - name: MAIL_PASS
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: password_mail
+        - name: URL_APP #URL APP
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_aplicacion
+        - name: URL_HOST_KNIME #URL SERVICIOS
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_knime
+        - name: URL_PORT_KNIME
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_knime
+        - name: URL_PATH_KNIME
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_knime
+        - name: URL_HOST_COGNITO #Cognito
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_cognito
+        - name: URL_PATH_COGNITO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_cognito
+        - name: URL_HOST_PROFILE #Profile
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_profile
+        - name: URL_PORT_PROFILE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_profile
+        - name: URL_PATH_PROFILE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_profile
+        - name: URL_HOST_CLIENTE #Consulta Cliente/Participantes
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_cliente
+        - name: URL_PORT_CLIENTE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_cliente
+        - name: URL_PATH_CLIENTE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_cliente
+        - name: URL_HOST_CATALOGO #Catalogos
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_catalogo
+        - name: URL_PORT_CATALOGO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_catalogo
+        - name: URL_PATH_CATALOGO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_catalogo
+        - name: URL_HOST_INSPEKTOR #Inspektor
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_inspektor
+        - name: URL_PORT_INSPEKTOR
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_inspektor
+        - name: URL_PATH_INSPEKTOR
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_inspektor
+        - name: URL_HOST_CREAR_PARTICIPANTES_PJ #Crear Participantes PJ
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_crear_participantes_pj
+        - name: URL_PORT_CREAR_PARTICIPANTES_PJ
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_crear_participantes_pj
+        - name: URL_PATH_CREAR_PARTICIPANTES_PJ
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_crear_participantes_pj
+        - name: URL_HOST_CREAR_PARTICIPANTES_PN #Crear Participantes PN
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_crear_participantes_pn
+        - name: URL_PORT_CREAR_PARTICIPANTES_PN
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_crear_participantes_pn
+        - name: URL_PATH_CREAR_PARTICIPANTES_PN
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_crear_participantes_pn
+        - name: URL_HOST_CREAR_CLIENTES_PJ #Crear Clientes PJ
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_crear_cliente_pj
+        - name: URL_PORT_CREAR_CLIENTES_PJ
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: puerto_crear_cliente_pj
+        - name: URL_PATH_CREAR_CLIENTES_PJ
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_crear_cliente_pj
+        - name: KEYCLOAK_TOKEN_HOST #Keycloakqa
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: host_keycloak_token
+        - name: KEYCLOAK_TOKEN_PORT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: port_keycloak_token
+        - name: KEYCLOAK_TOKEN_PATH
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_keycloak_token
+        - name: KEYCLOAK_GRANT_TYPE ##
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: keycloak_grant_type
+        - name: KEYCLOAK_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: keycloak_cliente_id
+        - name: KEYCLOAK_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: keycloak_cliente_secret
+        - name: TIMEDOUT_lOGIN #TIMEDOUT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: timedout_sesiones
+        - name: TIMEDOUT_SERVICES
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: timedout_servicios
+        - name: TIMEDOUT_KNIME
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: timedout_knime
+        - name: NEXT_PUBLIC_INACTIVITY_TIME #SESSION INACTIVITY
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: inactivity_time
+        - name: NEXT_PUBLIC_MODAL_DISPLAY_TIME
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: modal_display_time
+        - name: NEXT_PUBLIC_SESSION_EXPIRATION_TIME
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: session_expiration_time
+        - name: AWS_S3_REGION #BUCKET_S3
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: region_aws
+        - name: AWS_S3_BUCKET_NAME
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: nombre_bucket
+        - name: AWS_S3_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: access_key_bucket
+        - name: AWS_S3_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: secret_access_bucket
+        - name: AWS_S3_PATH
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: path_bucket
+        - name: URL_HOST_CREAR_CUENTASMAESTRAS ##Crear Producto Captacion
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_productoCaptacion
+        - name: URL_PORT_CREAR_CUENTASMAESTRAS
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_productoCaptacion
+        - name: URL_PATH_CREAR_CUENTASMAESTRAS
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_productoCaptacion
+        - name: URL_HOST_CUENTA_SOBREGIRO ##Consultar Cuentas
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_cuentaSobregiro
+        - name: URL_PORT_CUENTA_SOBREGIRO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_cuentaSobregiro
+        - name: URL_PATH_CUENTA_SOBREGIRO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_cuentaSobregiro
+        - name: URL_HOST_ASIGNAR_SOBREGIRO ##Asignar Sobregiros
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_asignarSobregiro
+        - name: URL_PORT_ASIGNAR_SOBREGIRO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_asignarSobregiro
+        - name: URL_PATH_ASIGNAR_SOBREGIRO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_asignarSobregiro
+        - name: URL_HOST_CREAR_PAP ##Crear PAP
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_crearPAP
+        - name: URL_PORT_CREAR_PAP
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_crearPAP
+        - name: URL_PATH_CREAR_PAP
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_crearPAP
+        - name: URL_HOST_ENVIAR_CORREO ##Enviar Correo
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_enviarCorreo
+        - name: URL_PORT_ENVIAR_CORREO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_enviarCorreo
+        - name: URL_PATH_ENVIAR_CORREO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_enviarCorreo
+        - name: URL_HOST_QUERY_CORTE ##Consultar Fecha de Corte
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_queryCorte
+        - name: URL_PORT_QUERY_CORTE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_queryCorte
+        - name: URL_PATH_QUERY_CORTE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_queryCorte
+        - name: URL_HOST_QUERY_DEPOSITOPLAZO ##Consultar Deposito a Plazo
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_queryDepositoPlazo
+        - name: URL_PORT_QUERY_DEPOSITOPLAZO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_queryDepositoPlazo
+        - name: URL_PATH_QUERY_DEPOSITOPLAZO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_queryDepositoPlazo
+        - name: URL_HOST_SIMULAR_DEPOSITOPLAZO ##Simular Deposito a Plazo
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_simularDepositoPlazo
+        - name: URL_PORT_SIMULAR_DEPOSITOPLAZO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_simularDepositoPlazo
+        - name: URL_PATH_SIMULAR_DEPOSITOPLAZO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_simularDepositoPlazo
+        - name: URL_HOST_CREAR_CDT ##Crear CDT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_host_crearCdt
+        - name: URL_PORT_CREAR_CDT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_port_crearCdt
+        - name: URL_PATH_CREAR_CDT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: url_path_crearCdt
+        - name: ORINATINGBANK ##Canonicals-header
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: orinatingBank
+        - name: CALLBACKURL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: callBackUrl
+        - name: CHANNEL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: channel
+        - name: PRIORITY ##Canonicals-metadata
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: priority
+        - name: SERVICELEVELAGREEMENT
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: serviceLevelAgreement
+        - name: PROCESSINGMODE
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: processingMode
+        - name: APPNAME ##Canonicals-clientApp
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: appName
+        - name: APPVERSION
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: appVersion
+        - name: NODE_TLS_REJECT_UNAUTHORIZED ## activar certificado
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-db-secret
+              key: certificado_ssl
+        - name: SERVICIO_CORE
+          value: "apbancaemp"
+        - name: SERVICIO_MEDIACION
+          value: "apbancaemp"
+        - name: NIVEL_LOG
+          value: "3"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: banca-comercial
+  name: apbancaemp-service
+  annotations:
+    #service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS13-1-2-2021-06"
+    #service.beta.kubernetes.io/aws-load-balancer-type: nlb-ip
+    #service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"  # Usa un Network Load Balancer (NLB)
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "interal"  # No expone el NLB a Internet
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"  # Conectar directamente a los pods
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:618817091491:certificate/bdc470c9-e382-4f6a-9419-66f5efa73d64"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+spec:
+  ports:
+  - name: https
+    port: 443
+    targetPort: 8080
+    protocol: TCP
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: apbancaemp

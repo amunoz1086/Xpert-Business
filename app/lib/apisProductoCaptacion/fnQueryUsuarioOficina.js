@@ -1,0 +1,34 @@
+'use server'
+
+import { pool } from "@/config/conectPRICINGDB";
+
+export const fnQueryUsuarioOficina = async (req) => {
+
+    const { pUsuario } = JSON.parse(req);
+
+    const sqlString = `CALL queryUsuarioOficina(?)`;
+    let responsServer = {};
+
+    try {
+
+        const [rows] = await pool.query(sqlString, [pUsuario]);
+
+        if (rows[0].length === 0) {
+            responsServer.STATUS = 202;
+            responsServer.MESSAGE = `usuario ${pUsuario} no registrado`;
+            return JSON.stringify(responsServer);
+
+        } else {
+            responsServer.STATUS = 200;
+            responsServer.dataOficial = rows[0];
+            return JSON.stringify(responsServer);
+        }
+
+    } catch (error) {
+        responsServer.STATUS = 500;
+        responsServer.CODE = error.code;
+        responsServer.MESSAGE = error.sqlMessage;
+        return JSON.stringify(responsServer);
+    };
+
+};
