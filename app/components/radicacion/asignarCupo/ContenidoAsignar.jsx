@@ -9,6 +9,7 @@ import ModalsForForm from "../../share/ModalsForForm";
 import { CampoLista } from "../../share/CampoLista";
 import { CampoFecha } from "../../share/CampoFecha";
 import { CampoNumero } from "../../share/CampoNumero";
+import { CampoMonedaDecimal } from "../../share/CampoMonedaDecimal";
 import { queryListTipoSobregiro } from "@/app/lib/menuPrincipal/actions";
 import { fn_orquestadorAsignarSobregiro } from "@/app/lib/apisProductoCupo/fn_orquestadorAsignarSobregiro";
 import { fn_queryAsignacionCuenta } from "@/app/lib/apisProductoCupo/fn_queryAsignacionCuenta";
@@ -16,6 +17,7 @@ import { obtenerCookiePerfil } from "@/app/lib/auth/auth";
 import { fn_update_cupoSobregiro } from "@/app/lib/apisProductoCupo/fn_update_cupoSobregiro";
 import { fn_insert_cupoSobregiro } from "@/app/lib/apisProductoCupo/fn_insert_cupoSobregiro";
 import { fn_enviarCorreo } from "@/app/lib/apisProductoCupo/fn_enviarCorreo";
+import { conversionPesos } from "@/app/lib/utils";
 
 
 const DynamicModal = dynamic(() => import('../../share/Modals'), { ssr: false });
@@ -56,15 +58,23 @@ export const ContenidoAsignar = ({ datos }) => {
     /* Cargando Datos Consulta Cuentas */
     useEffect(() => {
         let rawDataCuentas;
-
         if (datos.hasOwnProperty("dataSobregiro")) {
-            rawDataCuentas = datos.data.filter(cuentas => datos.dataSobregiro.includes(cuentas.AccountID));
+            rawDataCuentas = datos.dataSobregiro
+                .map(id => {
+                    const datCuentas = datos.data.find(c => c.AccountID === id.numero_cuenta);
+                    if (!datCuentas) return null;
+                    return {
+                        ...datCuentas,
+                        acta: id.acta
+                    };
+                })
+                .filter(Boolean);
+
             setDataCuentas(rawDataCuentas || []);
         } else {
             rawDataCuentas = datos.data;
             setDataCuentas(rawDataCuentas || []);
         };
-
     }, [datos]);
 
 
@@ -127,22 +137,28 @@ export const ContenidoAsignar = ({ datos }) => {
 
     /* Ejecutando Form Asignacion */
     const selectCuenta = (e) => {
+
+        const elementSelect = document.getElementById(e.target.id);
+        const dataSetNumCuenta = elementSelect.dataset.numcuenta;
+        const dataSetActa = elementSelect.dataset.acta;
+
         if (+perfilActivo === 602) {
             setNumeroCuentaValue(e.currentTarget.textContent.trim());
             setTipoSobregiroValue('O');
             setMostrarModalCrear(true);
         } else if (+perfilActivo === 3) {
-            asignacionCupos(e.currentTarget.textContent.trim());
+            asignacionCupos(dataSetNumCuenta, dataSetActa);
         };
     };
 
 
     /* Validar Datos Asignacion */
-    const asignacionCupos = async (pNumeroCuenta) => {
+    const asignacionCupos = async (pNumeroCuenta, pActa) => {
         setShowLoading(true);
 
         const cuenta = {
-            "numeroCuenta": pNumeroCuenta
+            "numeroCuenta": pNumeroCuenta,
+            "acta": pActa
         };
 
         try {
@@ -161,7 +177,7 @@ export const ContenidoAsignar = ({ datos }) => {
             setNumeroCuentaValue(rawAsignacion.DATA[0].numero_cuenta);
             setTipoSobregiroValue(rawAsignacion.DATA[0].tipo_sobregiro);
             setFechaAprobacionValue(fechaFormateada);
-            setMontoValue(rawAsignacion.DATA[0].monto);
+            setMontoValue(conversionPesos({ valor: rawAsignacion.DATA[0].monto, nDecimales: 2 }));
             setVigenciaValue(rawAsignacion.DATA[0].dias_vigencia);
             setNumeroActaValue(rawAsignacion.DATA[0].acta_aprobacion_id);
             setDia(+rawAsignacion.DATA[0].dias_vigencia > 1 ? 'días' : 'día');
@@ -253,10 +269,10 @@ export const ContenidoAsignar = ({ datos }) => {
 
         setShowLoading(false);
 
-        if (parsedResGuardar.STATUS !== 200) {
+        if (+parsedResGuardar.STATUS !== 200) {
 
-            if (parsedResGuardar.CODE === 'ER_DUP_ENTRY') {
-                setMessageNotificacionModal(`Ya existe un acta de aprobación con el número: ${rawDataSave.numeroActa}`);
+            if (+parsedResGuardar.STATUS === 204 || +parsedResGuardar.STATUS === 202) {
+                setMessageNotificacionModal(`${parsedResGuardar.MESSAGE}`);
                 setShowNotificacionModal(true);
                 return;
             };
@@ -333,7 +349,6 @@ export const ContenidoAsignar = ({ datos }) => {
             setShowNotificacionAsignacion(true);
 
             //correo
-
             let rawDataCorreo = {
                 "destinatarios": [correoRadicador],
                 "mensaje": `Cordial saludo,<br><br> El cupo solicitado para el cliente <b>${dataCuentas[0].ClientID}</b>, quedo Asignado correctamente.`,
@@ -382,7 +397,6 @@ export const ContenidoAsignar = ({ datos }) => {
         setShowNotificacionAsignacion(true);
 
         //correo
-
         let rawDataCorreo = {
             "destinatarios": [correoRadicador],
             "mensaje": `Cordial saludo,<br><br> El cupo solicitado para el cliente <b>${dataCuentas[0].ClientID}</b>, fue rechazado bajo la siguiente observación: <br><br> ▸ ${observacion}`,
@@ -461,12 +475,15 @@ export const ContenidoAsignar = ({ datos }) => {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {dataCuentas.length > 0 ? (
-                                        dataCuentas.map((fila) => (
-                                            <tr key={fila.AccountID}>
+                                        dataCuentas.map((fila, i) => (
+                                            <tr key={`${fila.AccountID}-${fila.acta}`}>
                                                 <td
                                                     className="px-6 py-4 whitespace-nowrap">
                                                     <button
+                                                        id={`${fila.acta}_${i}`}
                                                         className='text-sm text-blue-800 decoration-solid underline cursor-pointer'
+                                                        data-acta={fila.acta}
+                                                        data-numcuenta={fila.AccountID}
                                                         onClick={(e) => selectCuenta(e)}
                                                     >
                                                         {fila.AccountID}
@@ -574,12 +591,21 @@ export const ContenidoAsignar = ({ datos }) => {
                                         <th id="monto" scope="row" className='border border-gray-300 text-left py-[0.9rem] pl-1 bg-gray-200 text-sm'>Monto</th>
                                         <td className='border border-gray-100 text-left text-sm'>
                                             <div className='px-1'>
-                                                <CampoNumero
+                                                {/* <CampoNumero
                                                     valorInput={montoValue}
                                                     onChangeInput={onChangeElement}
                                                     nameInput={"monto"}
                                                     placeholder=''
                                                     validacionRequeridoEditable={{ requerido: false, estado: +perfilActivo === 3 }}
+                                                /> */}
+                                                <CampoMonedaDecimal
+                                                    valorInput={montoValue}
+                                                    onChangeInput={onChangeElement}
+                                                    nameInput={"monto"}
+                                                    placeholder=''
+                                                    estado={+perfilActivo === 3}
+                                                    requerido={false}
+                                                    nDecimales={2}
                                                 />
                                             </div>
                                         </td>

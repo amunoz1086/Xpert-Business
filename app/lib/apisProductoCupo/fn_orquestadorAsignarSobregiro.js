@@ -13,10 +13,11 @@ export const fn_orquestadorAsignarSobregiro = async (data) => {
     const dataReques = {
       "Identification": numeroCuenta,
       "Type": tipoSobregiro,
-      "Amount": parseFloat(monto).toFixed(2),
+      "Amount": await prepararMonto(monto),
       "ExpiryDate": convertirFecha(fechaVencimiento)
     };
 
+    
     const dataCrear = await fnDatosBasicos(dataReques);
     console.log(dataCrear);
 
@@ -67,4 +68,28 @@ async function guardarAsignacionBd(pData) {
   } else {
     console.error(`##Guardando asignacion en BD estatus: ${parsedRes.STATUS}`);
   };
+};
+
+
+async function prepararMonto(pMonto) {
+  pMonto = pMonto.replace(/[^\d.,]/g, '');
+  const montoSplit = pMonto.split('');
+  let controlIDX = 0;
+
+  for (const i of montoSplit) {
+    if (i === '.') {
+      montoSplit.splice(controlIDX, 1);
+    };
+    controlIDX = controlIDX + 1
+  };
+
+  pMonto = (montoSplit.join(''));
+  pMonto = pMonto.replace(',', '.');
+
+  const numero = parseFloat(pMonto);
+  if (isNaN(numero)) {
+    throw new Error('El monto no es válido.');
+  };
+
+  return pMonto;
 };

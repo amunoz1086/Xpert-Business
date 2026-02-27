@@ -15,7 +15,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - image: 618817091491.dkr.ecr.us-east-1.amazonaws.com/apbancaemp:1.1.29A
+      - image: 618817091491.dkr.ecr.us-east-1.amazonaws.com/apbancaemp:1.1.32
         name: apbancaemp
         ports:
         - containerPort: 8080
@@ -509,6 +509,8 @@ spec:
           value: "apbancaemp"
         - name: NIVEL_LOG
           value: "3"
+        - name: TZ
+          value: America/Bogota
 ---
 apiVersion: v1
 kind: Service

@@ -32,6 +32,8 @@ import { rangosFrecuencias, minimosMaximos, diaHabil } from "@/app/lib/apisProdu
 import { formatearFecha } from '@/app/lib/utils';
 import { CampoLista } from "../../share/CampoLista";
 import { CampoNumero } from "../../share/CampoNumero";
+import { conversionPesos, validarCompoRequerido } from "@/app/lib/utils";
+import { CampoMonedaDecimal } from "../../share/CampoMonedaDecimal";
 
 
 const DynamicModal = dynamic(() => import('../../share/Modals'), { ssr: false });
@@ -785,9 +787,9 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
     const deleteRowFormaPago = (id, e) => {
         e.preventDefault();
         const toDelete = formaRecepcionAsignada.find(r => r.id === id);
-        const cleanToDeleteMonto = +toDelete?.fr_monto.replace(/\./g, '').replace(/[^\d]/g, '');
-        const cleanTotalRecibir = +formFormaRecepcion.totalRecibir.replace(/\./g, '').replace(/[^\d]/g, '');
-        const totalSumRecibir = (cleanToDeleteMonto + cleanTotalRecibir);
+        const cleanToDeleteMonto = prepararMonto(toDelete?.fr_monto);
+        const cleanTotalRecibir = prepararMonto(formFormaRecepcion.totalRecibir);
+        const totalSumRecibir = (parseFloat(cleanToDeleteMonto) + parseFloat(cleanTotalRecibir));
 
         const totalSumRecibirFormateado = totalSumRecibir
             ? new Intl.NumberFormat('es-CO', {
@@ -805,7 +807,6 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
         setFormaRecepcionAsignada(formaRecepcionAsignada.filter(delt => delt.id !== id));
         setIsActivarAgregarFormaRecepcion(false);
         setIsActivarContinuarFormaRecepcion(true);
-
     };
 
 
@@ -927,7 +928,6 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
         }; */
 
         endModal();
-
     };
 
 
@@ -950,7 +950,6 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
             rawData.ncuenta = crearCDT?.operation?.termDepositArrangement?.Deposit?.AccountIdentifier;
             rawData.codeCuenta = crearCDT?.operation?.termDepositArrangement?.Deposit?.Code;
             rawData.usu = crearCDT?.usu;
-
 
             if (+crearCDT.status !== 200) {
                 setShowLoading(false);
@@ -1178,8 +1177,8 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
                 return;
             };
 
-            // Monto
-            if (name === 'monto') {
+            // Monto.
+            /* if (name === 'monto') {
                 const limpio = value.replace(/\./g, '').replace(/[^\d]/g, '');
                 const formateado = limpio
                     ? new Intl.NumberFormat('es-CO', {
@@ -1197,7 +1196,7 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
                     ...state,
                     [name]: value,
                 }));
-            };
+            }; */
 
             // Plazo
             if (name === 'plazo') {
@@ -1305,7 +1304,7 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
             };
 
             // Monto Forma de Recepción
-            if (name === 'fr_monto') {
+            /* if (name === 'fr_monto') {
                 const limpio = value.replace(/\./g, '').replace(/[^\d]/g, '');
                 const formateado = limpio
                     ? new Intl.NumberFormat('es-CO', {
@@ -1320,7 +1319,7 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
                 }));
 
                 return;
-            };
+            }; */
 
         } catch (error) {
             console.log(error)
@@ -1409,18 +1408,21 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
 
     const onBlurNValor = async (e) => {
         e.preventDefault();
-        const { value } = e.target;
+        const { value, name } = e.target;
 
         if (value === '') {
             setIsNValorValido(false);
             return;
         };
 
-        // Monto
-        const cleanMonto = value.replace(/\./g, '').replace(/[^\d]/g, '');
-        const cleanMontoMinimo = montominimo.replace(/\./g, '').replace(/[^\d]/g, '');
+        setFormOperacion((state) => ({
+            ...state,
+            [name]: conversionPesos({ valor: value, nDecimales: 2 }),
+        }));
 
-        let validacion = +cleanMonto < +cleanMontoMinimo;
+        // Monto
+        const cleanMontoMinimo = montominimo.replace(/\./g, '').replace(/[^\d]/g, '');
+        let validacion = +value < parseFloat(cleanMontoMinimo);
 
         if (validacion) {
             setIsNValorValido(true);
@@ -1883,11 +1885,11 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
             return;
         };
 
-        const cleanTotalRecibir = +formFormaRecepcion.totalRecibir.replace(/\./g, '').replace(/[^\d]/g, '');
-        const cleanMontoRecibir = +formFormaRecepcion.fr_monto.replace(/\./g, '').replace(/[^\d]/g, '');
-        const totalSubtractRecibir = (cleanTotalRecibir - cleanMontoRecibir);
+        const cleanTotalRecibir = prepararMonto(formFormaRecepcion.totalRecibir);
+        const cleanMontoRecibir = formFormaRecepcion.fr_monto;
+        const totalSubtractRecibir = (parseFloat(cleanTotalRecibir) - parseFloat(cleanMontoRecibir));
 
-        if (cleanMontoRecibir > cleanTotalRecibir) {
+        if (totalSubtractRecibir < 0) {
             setMessageNotificacionModal('El monto a pagar no debe ser mayor al total a recibir');
             setShowNotificacionModal(true);
             return;
@@ -1904,7 +1906,7 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
             fr_moneda: filtroMoneda[0].value,
             fr_monedaCode: formFormaRecepcion.fr_moneda,
             fr_cuenta: formFormaRecepcion.fr_cuenta.trim(),
-            fr_monto: formFormaRecepcion.fr_monto
+            fr_monto: conversionPesos({ valor: formFormaRecepcion.fr_monto, nDecimales: 2 }) //(formFormaRecepcion.fr_monto)
         };
         setFormaRecepcionAsignada([...formaRecepcionAsignada, newFormaRecepcion]);
 
@@ -1930,6 +1932,29 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
             setIsActivarFormaPago(true);
             return;
         };
+    };
+
+    const prepararMonto = (pMonto) => {
+        pMonto = pMonto.replace(/[^\d.,]/g, '');
+        const montoSplit = pMonto.split('');
+        let controlIDX = 0;
+
+        for (const i of montoSplit) {
+            if (i === '.') {
+                montoSplit.splice(controlIDX, 1);
+            };
+            controlIDX = controlIDX + 1
+        };
+
+        pMonto = (montoSplit.join(''));
+        pMonto = pMonto.replace(',', '.');
+
+        const numero = parseFloat(pMonto);
+        if (isNaN(numero)) {
+            throw new Error('El monto no es válido.');
+        };
+
+        return pMonto;
     };
 
 
@@ -2005,7 +2030,7 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
                                                                 <tr key={fila.Identification}>
                                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fila.IdentifierValue.Value}</td>
                                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fila.ProductName.Name}</td>
-                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fila.AvailableAmount}</td>
+                                                                    <td className="py-4 whitespace-nowrap text-sm text-left text-gray-900">{conversionPesos({ valor: fila.AvailableAmount, nDecimales: 2 })}</td>
                                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fila.ToDateTime.DateTimeContent}</td>
                                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{fila.Status}</td>
                                                                 </tr>
@@ -2361,6 +2386,16 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
                                                             required={true}
                                                             onChange={onChangeOperacion}
                                                             onBlur={onBlurNValor}
+                                                            onFocus={(e) => {
+                                                                let cleanedNumber = e.target.value.replace(/[^\d,]/g, '');
+                                                                cleanedNumber = cleanedNumber.replace(/\./g, '');
+                                                                cleanedNumber = cleanedNumber.replace(/,/g, '.');
+                                                                e.target.value = cleanedNumber != '' ? parseFloat(cleanedNumber) : e.target.value
+                                                            }}
+                                                            onInput={(e) => {
+                                                                const cleanedNumber = e.target.value.replace(/[^\d.]/g, '');
+                                                                e.target.value = cleanedNumber.replace(/(\.)(?=.*\.)/g, '');
+                                                            }}
                                                             className='block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
                                                         />
                                                         {(isNValorValido)
@@ -2690,12 +2725,21 @@ export const ContenidoDepositoPlazo = ({ dataDepositoPlazo }) => {
                                                             </div>
                                                             {/* Monto */}
                                                             <div className='w-[20%]'>
-                                                                <CampoNumero
+                                                                {/* <CampoNumero
                                                                     valorInput={formFormaRecepcion.fr_monto}
                                                                     onChangeInput={onChangeRecepcion}
                                                                     nameInput={"fr_monto"}
                                                                     placeholder='Monto'
                                                                     validacionRequeridoEditable={{ requerido: true, estado: false }}
+                                                                /> */}
+                                                                <CampoMonedaDecimal
+                                                                    valorInput={formFormaRecepcion.fr_monto}
+                                                                    onChangeInput={onChangeRecepcion}
+                                                                    nameInput={"fr_monto"}
+                                                                    placeholder='Monto'
+                                                                    estado={false}
+                                                                    requerido={true}
+                                                                    nDecimales={2}
                                                                 />
                                                             </div>
                                                             {/* Agregar */}

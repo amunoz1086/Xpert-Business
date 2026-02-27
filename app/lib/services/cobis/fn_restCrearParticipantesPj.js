@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -34,6 +34,12 @@ async function fn_restCrearParticipantesPj(dataReques) {
     const CREAR_PARTICIPANTES_PORT = process.env.URL_PORT_CREAR_PARTICIPANTES_PJ;
     const CREAR_PARTICIPANTES_PATH = process.env.URL_PATH_CREAR_PARTICIPANTES_PJ;
 
+    const PROTOCOL = (http ? 'http' : 'https');
+    const externalUrl = `${PROTOCOL}://${CREAR_PARTICIPANTES_HOST.trim()}${CREAR_PARTICIPANTES_PORT ? `:${CREAR_PARTICIPANTES_PORT.trim()}` : ''}${CREAR_PARTICIPANTES_PATH.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
     const { access_token, token_type } = await getAccessToken();
     const usuario = (await getSession()).userBACK.user;
 
@@ -59,7 +65,7 @@ async function fn_restCrearParticipantesPj(dataReques) {
 
         let promise = new Promise(function (resolve, reject) {
 
-            const req = https.request(options, res => {
+            const req = http.request(options, res => {
                 res.setEncoding('utf8');               // decodifica directamente a string
                 json_data.status = res.statusCode;
                 let body = '';
@@ -245,6 +251,8 @@ async function fn_restCrearParticipantesPj(dataReques) {
         return JSON.stringify(response_json_data);
 
     } catch (error) {
+        console.log(`❌ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
         console.error(error);
     };
 };

@@ -5,6 +5,7 @@ DELIMITER $$
 			SELECT 
 				A.numero_cuenta,
 				A.estado_solicitud AS cod_Estado,
+				A.acta_aprobacion_id AS acta,
 				B.descripcion
 			FROM cupo_sobregiro AS A
 			JOIN Listas AS B ON B.lista = 'EstadoSobregiro' AND B.codLista = A.estado_solicitud

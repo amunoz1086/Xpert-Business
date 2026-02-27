@@ -96,7 +96,7 @@ export default function FormSearch({ enableInput, btnConsultar, onBuscar }) {
 
                 if (+perfilUsuario.value === 3) {
                     rawSobregirospendientes = JSON.parse(await fn_querySobregiroPendiente(JSON.stringify(dataBuscarClientePj)));
-
+                    
                     if (rawSobregirospendientes.STATUS !== 200) {
                         setLoading(false);
                         setMessageModal(`Cliente ${dataBuscarClientePj.identification} no cuenta con solicitudes pendientes`);

@@ -1,4 +1,4 @@
-const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
@@ -11,6 +11,12 @@ async function fn_restInspektor(dataReques) {
     const INSPEKTOR_HOST = process.env.URL_HOST_INSPEKTOR;
     const INSPEKTOR_PORT = process.env.URL_PORT_INSPEKTOR;
     const INSPEKTOR_path = process.env.URL_PATH_INSPEKTOR;
+
+    const PROTOCOL = (http ? 'http' : 'https');
+    const externalUrl = `${PROTOCOL}://${INSPEKTOR_HOST.trim()}${INSPEKTOR_PORT ? `:${INSPEKTOR_PORT.trim()}` : ''}${INSPEKTOR_path.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
 
     const token = JSON.parse(await keycloakqa.fn_restKeycloak());
     const access_token = token.data.access_token;
@@ -39,7 +45,7 @@ async function fn_restInspektor(dataReques) {
 
         let promise = new Promise(function (resolve, reject) {
 
-            const req = https.request(options, function (res) {
+            const req = http.request(options, function (res) {
                 const chunks = [];
                 json_data.status = res.statusCode;
 
@@ -113,6 +119,8 @@ async function fn_restInspektor(dataReques) {
         return JSON.stringify(response_json_data);
 
     } catch (error) {
+        console.log(`❌ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
         console.error('❌ Error en fn_restInspektor:', error);
     };
 };

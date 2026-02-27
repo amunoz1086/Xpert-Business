@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -44,6 +44,12 @@ async function fn_restCrearCDT(dataReques, firmantes, recepcion, metodoInto, met
   const CREAR_CDT_PORT = process.env.URL_PORT_CREAR_CDT;
   const CREAR_CDT_PATH = process.env.URL_PATH_CREAR_CDT;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${CREAR_CDT_HOST.trim()}${CREAR_CDT_PORT ? `:${CREAR_CDT_PORT.trim()}` : ''}${CREAR_CDT_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
 
   let json_data = {};
@@ -66,7 +72,7 @@ async function fn_restCrearCDT(dataReques, firmantes, recepcion, metodoInto, met
 
 
     let promise = new Promise(function (resolve, reject) {
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');
         json_data.status = res.statusCode;
         let body = '';
@@ -188,6 +194,8 @@ async function fn_restCrearCDT(dataReques, firmantes, recepcion, metodoInto, met
         response_json_data.data = JSON.parse(result.data);
       })
       .catch(error => {
+        console.log(`❌ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
         throw (error);
       });
 

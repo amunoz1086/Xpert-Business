@@ -1,6 +1,6 @@
 /* MP: funcion para conectarse con la API vinvulaCliente para consultar Persona Natural */
 
-const https = require('https');
+const https = require('http');
 const fs = require('fs');
 const bearerToken = require('../cognito/fn_restCognito');
 

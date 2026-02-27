@@ -14,12 +14,16 @@ export const fn_insert_cupoSobregiro = async (req) => {
     try {
         const [rows] = await pool.query(sqlString, [clientID, numeroCuenta, tipoSobregiro, vigencia, monto, fechaAprobacion, convertirFecha(fechaVencimiento), numeroActa, usuario, EdoSolicitud]);
 
-        if (rows.affectedRows > 0) {
+        if (+rows[0][0].state === 200) {
             responsServer.STATUS = 200;
-        } else {
+        } else if (+rows[0][0].state === 400) {
+            responsServer.STATUS = 204;
+            responsServer.MESSAGE = rows[0][0].sms;
+            //return JSON.stringify(responsServer)
+        } else if (+rows[0][0].state === 500) {
             responsServer.STATUS = 202;
-            responsServer.MESSAGE = 'No se pudo completar la inserción';
-            return JSON.stringify(responsServer)
+            responsServer.MESSAGE = rows[0][0].sms;
+            //return JSON.stringify(responsServer)
         };
 
         return JSON.stringify(responsServer);

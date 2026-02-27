@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -28,6 +28,12 @@ async function fn_restAsignarSobregiro(dataReques) {
   const ASIGNAR_SOBREGIRO_PORT = process.env.URL_PORT_ASIGNAR_SOBREGIRO;
   const ASIGNAR_SOBREGIRO_PATH = process.env.URL_PATH_ASIGNAR_SOBREGIRO;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${ASIGNAR_SOBREGIRO_HOST.trim()}${ASIGNAR_SOBREGIRO_PORT ? `:${ASIGNAR_SOBREGIRO_PORT.trim()}` : ''}${ASIGNAR_SOBREGIRO_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
   const usuario = (await getSession()).userBACK.user;
 
@@ -52,7 +58,7 @@ async function fn_restAsignarSobregiro(dataReques) {
 
     let promise = new Promise(function (resolve, reject) {
 
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');               // decodifica directamente a string
         json_data.status = res.statusCode;
         let body = '';
@@ -138,6 +144,8 @@ async function fn_restAsignarSobregiro(dataReques) {
     return JSON.stringify(response_json_data);
 
   } catch (error) {
+    console.error(`❌ External API URL: ${externalUrl}`);
+    console.error(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
     console.error(error);
   };
 };

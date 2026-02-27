@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -48,6 +48,12 @@ async function fn_restCrearCuentaMaestra(dataReques, propietarios) {
   const CREAR_CUENTASMAESTRAS_PORT = process.env.URL_PORT_CREAR_CUENTASMAESTRAS;
   const CREAR_CUENTASMAESTRAS_PATH = process.env.URL_PATH_CREAR_CUENTASMAESTRAS;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${CREAR_CUENTASMAESTRAS_HOST.trim()}${CREAR_CUENTASMAESTRAS_PORT ? `:${CREAR_CUENTASMAESTRAS_PORT.trim()}` : ''}${CREAR_CUENTASMAESTRAS_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
 
   let json_data = {};
@@ -70,7 +76,7 @@ async function fn_restCrearCuentaMaestra(dataReques, propietarios) {
     };
 
     let promise = new Promise(function (resolve, reject) {
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');               // decodifica directamente a string
         json_data.status = res.statusCode;
         let body = '';
@@ -157,7 +163,7 @@ async function fn_restCrearCuentaMaestra(dataReques, propietarios) {
 
       const postData = JSON.stringify(payload);
       let parsedPostData = JSON.parse(postData);
-      
+
       console.log('✅ request Producto Captación:', JSON.stringify(parsedPostData, null, 2));
 
       //captura errores de la request
@@ -179,6 +185,8 @@ async function fn_restCrearCuentaMaestra(dataReques, propietarios) {
     return JSON.stringify(response_json_data);
 
   } catch (error) {
+    console.log(`❌ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
     console.error(error);
   };
 };

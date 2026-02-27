@@ -1,8 +1,7 @@
-const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
-//const bearerToken = require('../cognito/fn_restCognito');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
 
 async function fn_restConsultarCatalogos(dataReques) {
@@ -10,8 +9,14 @@ async function fn_restConsultarCatalogos(dataReques) {
     const { catalogo } = JSON.parse(dataReques);
 
     const CAT_HOST = process.env.URL_HOST_CATALOGO;
-    //const CAT_PORT = process.env.URL_PORT_CATALOGO;
+    const CAT_PORT = process.env.URL_PORT_CATALOGO;
     const CAT_PATH = process.env.URL_PATH_CATALOGO;
+
+    const PROTOCOL = (http ? 'http' : 'https');
+    const externalUrl = `${PROTOCOL}://${CAT_HOST.trim()}${CAT_PORT ? `:${CAT_PORT.trim()}` : ''}${CAT_PATH.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
 
     const token = JSON.parse(await keycloakqa.fn_restKeycloakqa());
     const access_token = token.data.access_token;
@@ -22,6 +27,7 @@ async function fn_restConsultarCatalogos(dataReques) {
     const options = {
         'method': 'POST',
         'hostname': `${CAT_HOST}`,
+        'port': CAT_PORT,
         'path': `${CAT_PATH}`,
         'headers': {
             'Content-Type': 'application/json',
@@ -37,7 +43,7 @@ async function fn_restConsultarCatalogos(dataReques) {
 
         let promise = new Promise(function (resolve, reject) {
 
-            const req = https.request(options, function (res) {
+            const req = http.request(options, function (res) {
                 const chunks = [];
                 json_data.status = res.statusCode;
 
@@ -111,6 +117,8 @@ async function fn_restConsultarCatalogos(dataReques) {
         return JSON.stringify(response_json_data);
 
     } catch (error) {
+        console.log(`❌ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
         console.log(error);
     };
 };

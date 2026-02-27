@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -27,6 +27,12 @@ async function fn_restFechaCorte(dataReques) {
   const QUERY_CORTE_PORT = process.env.URL_PORT_QUERY_CORTE;
   const QUERY_CORTE_PATH = process.env.URL_PATH_QUERY_CORTE;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${QUERY_CORTE_HOST.trim()}${QUERY_CORTE_PORT ? `:${QUERY_CORTE_PORT.trim()}` : ''}${QUERY_CORTE_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
   const usuario = (await getSession()).userBACK.user;
 
@@ -50,7 +56,7 @@ async function fn_restFechaCorte(dataReques) {
 
 
     let promise = new Promise(function (resolve, reject) {
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');
         json_data.status = res.statusCode;
         let body = '';
@@ -124,6 +130,8 @@ async function fn_restFechaCorte(dataReques) {
     return JSON.stringify(response_json_data);
 
   } catch (error) {
+    console.log(`❌ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
     console.error('❌ Error Integratión Consultar Fecha Corte', error);
   };
 };

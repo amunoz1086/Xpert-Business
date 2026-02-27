@@ -1,4 +1,4 @@
-const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
@@ -12,6 +12,13 @@ async function fn_restCrearModificarClientePj(pDatosBasicos, pInformacionFinanci
     const CREAR_CLIENTES_HOST = process.env.URL_HOST_CREAR_CLIENTES_PJ;
     const CREAR_CLIENTES_PORT = process.env.URL_PORT_CREAR_CLIENTES_PJ;
     const CREAR_CLIENTES_PATH = process.env.URL_PATH_CREAR_CLIENTES_PJ;
+
+    const PROTOCOL = (http ? 'http' : 'https');
+    const externalUrl = `${PROTOCOL}://${CREAR_CLIENTES_HOST.trim()}${CREAR_CLIENTES_PORT ? `:${CREAR_CLIENTES_PORT.trim()}` : ''}${CREAR_CLIENTES_PATH.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
 
     const token = JSON.parse(await keycloakqa.fn_restKeycloakqa());
     const access_token = token.data.access_token;
@@ -38,7 +45,7 @@ async function fn_restCrearModificarClientePj(pDatosBasicos, pInformacionFinanci
 
         let promise = new Promise(function (resolve, reject) {
 
-            const req = https.request(options, function (res) {
+            const req = http.request(options, function (res) {
 
                 const chunks = [];
                 json_data.status = res.statusCode;
@@ -506,6 +513,9 @@ async function fn_restCrearModificarClientePj(pDatosBasicos, pInformacionFinanci
         return JSON.stringify(response_json_data);
 
     } catch (error) {
+
+        console.log(`❌ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
 
         const contError = JSON.parse(error);
         const errorData = JSON.parse(contError.data);

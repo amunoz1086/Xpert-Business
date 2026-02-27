@@ -34,7 +34,7 @@ export const fn_querySobregiroPendiente = async (req) => {
 function extracNumeroCuenta(rawSobregirosPendientes) {
     const numero_cuenta = [];
     for (let i of rawSobregirosPendientes) {
-        numero_cuenta.push(i.numero_cuenta);
+        numero_cuenta.push({ numero_cuenta: i.numero_cuenta, acta: i.acta });
     };
     return numero_cuenta;
 };

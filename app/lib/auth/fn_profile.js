@@ -47,6 +47,12 @@ export const val_fn_profile = async (userName, password) => {
     const PROFILE_PORT = process.env.URL_PORT_PROFILE;
     const PROFILE_PATH = process.env.URL_PATH_PROFILE;
 
+    const PROTOCOL = (https ? 'https' : 'http');
+    const externalUrl = `${PROTOCOL}://${PROFILE_HOST.trim()}${PROFILE_PORT ? `:${PROFILE_PORT.trim()}` : ''}${PROFILE_PATH.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
     const options = {
       'method': 'POST',
       'hostname': `${PROFILE_HOST.toString().trim()}`,

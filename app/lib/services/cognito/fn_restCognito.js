@@ -33,6 +33,12 @@ async function fn_restCognito() {
         const COGNITO_PATH = process.env.URL_PATH_COGNITO;
         const COGNITO_AUTH = Buffer.from(`${COGNITO_USU.toString().trim()}:${COGNITO_PASS.toString().trim()}`).toString('base64');
 
+        const PROTOCOL = (https ? 'https' : 'http');
+        const externalUrl = `${PROTOCOL}://${COGNITO_HOST.trim()}${COGNITO_PATH.trim()}`;
+
+        console.log(`✅ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
 
         const options = {
             'method': 'POST',

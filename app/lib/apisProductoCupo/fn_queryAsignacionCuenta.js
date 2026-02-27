@@ -4,15 +4,14 @@ import { pool } from '@/config/conectPRICINGDB';
 
 export const fn_queryAsignacionCuenta = async (req) => {
 
-    const { numeroCuenta } = JSON.parse(req);
-    console.log('####', numeroCuenta);
+    const { numeroCuenta, acta } = JSON.parse(req);
 
     let responsServer = {};
-    const sqlString = `CALL queryAsignacionCuenta(?)`;
+    const sqlString = `CALL queryAsignacionCuenta(?, ?)`;
 
     try {
-        const [rows] = await pool.query(sqlString, [numeroCuenta]);
-
+        const [rows] = await pool.query(sqlString, [numeroCuenta, acta]);
+        
         if (rows[0].length === 0) {
             responsServer.STATUS = 202;
             return JSON.stringify(responsServer);
@@ -23,6 +22,7 @@ export const fn_queryAsignacionCuenta = async (req) => {
         };
 
     } catch (error) {
+        console.log(error)
         responsServer.STATUS = 500;
         responsServer.CODE = error.code;
         responsServer.MESSAGE = error.sqlMessage;

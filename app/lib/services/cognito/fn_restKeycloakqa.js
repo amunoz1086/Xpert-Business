@@ -5,7 +5,7 @@ const querystring = require('querystring');
 
 async function fn_restKeycloakqa() {
 
-    
+
     if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     };
@@ -19,6 +19,12 @@ async function fn_restKeycloakqa() {
     const KEYCLOAK_GRANT_TYPE = process.env.KEYCLOAK_GRANT_TYPE;
     const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID;
     const KEYCLOAK_CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET;
+
+    const PROTOCOL = (https ? 'https' : 'http');
+    const externalUrl = `${PROTOCOL}://${KEYCLOAK_HOST.trim()}${KEYCLOAK_PORT ? `:${KEYCLOAK_PORT.trim()}` : ''}${KEYCLOAK_PATH.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
 
     let json_data = {};
     let response_json_data = {};
@@ -81,6 +87,8 @@ async function fn_restKeycloakqa() {
         return JSON.stringify(response_json_data);
 
     } catch (error) {
+        console.log(`❌ External API URL: ${externalUrl}`);
+        console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
         console.log('fn_restKeycloakqa:', error);
     };
 };

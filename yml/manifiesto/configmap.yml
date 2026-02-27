@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apbancaemp-configmap
+  namespace: banca-comercial
+data:
+  #PUERTO DESPLIEGUE
+  puerto_despliegue: "8080" 
+  #EMAIL
+  url_mail: "email-smtp.us-east-1.amazonaws.com"
+  puerto_mail: "2587"
+  ssl_tls_mail: "0"
+  #URL APP
+  url_aplicacion: ""
+  #URL KNIME
+  url_knime: "knimelb.devbancoomeva.co"
+  puerto_knime: ""
+  path_knime: "/knime/rest/v4/repository/QA/wantnget/pricing_v2:job-pool"
+  #URL COGNITO
+  url_cognito: "proveedores.auth.us-east-1.amazoncognito.com"
+  path_cognito: "/oauth2/token?grant_type=client_credentials"
+  #URL PROFILE
+  url_profile: "7dz4lxj80f.execute-api.us-east-1.amazonaws.com"
+  puerto_profile: ""
+  path_profile: "/QA/mediacionwsac/validateuser"
+  #URL QUERY Cliente/Participantes
+  url_cliente: "webappspruebas.devbancoomeva.co"
+  puerto_cliente: "80"
+  path_cliente: "/buc/api/v1/buc/consultaUnicaDatosCliente"
+  #URL CATALOGO
+  url_catalogo: "webappspruebas.devbancoomeva.co"
+  puerto_catalogo: ""
+  path_catalogo: "/UtilitiesAdmin/api/v3/Catalog/Get"
+  #URL INSPEKTOR
+  url_inspektor: "webappspruebas.devbancoomeva.co"
+  puerto_inspektor: "80"
+  path_inspektor: "/PartyReference/api/v3/Restricted/Retrieve"
+  #URL CREAR_PARTICIPANTES_PJ
+  url_crear_participantes_pj: "webappspruebas.devbancoomeva.co"
+  puerto_crear_participantes_pj: "80"
+  path_crear_participantes_pj: "/buc/api/v1/buc/crearModificarClientePjp"
+  #URL CREAR_PARTICIPANTES_PN
+  url_crear_participantes_pn: "webappspruebas.devbancoomeva.co"
+  puerto_crear_participantes_pn: "80"
+  path_crear_participantes_pn: "/buc/api/v1/buc/crearModificarClientePnp"
+  #URL CREAR_CLIENTE_PJ
+  url_crear_cliente_pj: "webappspruebas.devbancoomeva.co"
+  puerto_crear_cliente_pj: "80"
+  path_crear_cliente_pj: "/buc/api/v1/buc/crearModificarClientePj"
+  #URL KEYCLOAK
+  host_keycloak_token: "keycloakqa.bancoomeva.com.co"
+  port_keycloak_token: ""
+  path_keycloak_token: "/realms/qa-bancoomeva/protocol/openid-connect/token"
+  #TIMEDOUT
+  timedout_sesiones: "80"
+  timedout_servicios: "10000"
+  timedout_knime: "60000"
+  #SESSION INACTIVITY
+  inactivity_time: "30"
+  modal_display_time: "30"
+  session_expiration_time: "30"
+  #BUCKET_S3
+  region_aws: "us-east-1"
+  nombre_bucket: "pricingapprecios"
+  path_bucket: "Convenios/QA/DocumentosRadicados"
+  #URL CREAR_CUENTASMAESTRAS
+  url_productoCaptacion: "webappspruebas.devbancoomeva.co"
+  url_port_productoCaptacion: "80"
+  url_path_productoCaptacion: "/DepositAccountMgmt/api/v3/Capta/Initiate"
+  #URL CUENTA_SOBREGIRO
+  url_host_cuentaSobregiro: "webappspruebas.devbancoomeva.co"
+  url_port_cuentaSobregiro: "80"
+  url_path_cuentaSobregiro: "/SavingsAccount/api/v3/Retrieve"
+  #URL ASIGNAR_SOBREGIRO
+  url_host_asignarSobregiro: "webappspruebas.devbancoomeva.co"
+  url_port_asignarSobregiro: "80"
+  url_path_asignarSobregiro: "/CurrentAccount/api/v3/Overdraft/Initiate"
+  #URL CREAR_PAP
+  url_host_crearPAP: "webappsdev.devbancoomeva.co"
+  url_port_crearPAP: "80"
+  url_path_crearPAP: "/TermDeposit/api/v3/PAP/Initiate"
+  #URL ENVIAR_CORREO
+  url_host_enviarCorreo: "webappspruebas.devbancoomeva.co"
+  url_port_enviarCorreo: "80"
+  url_path_enviarCorreo: "/UtilitiesAdmin/api/v3/Email/Send"
+  #URL QUERY_CORTE
+  url_host_queryCorte: "webappsdev.devbancoomeva.co"
+  url_port_queryCorte: "80"
+  url_path_queryCorte: "/customerBilling/api/v2/retrieveNextBillingCycle"
+  #URL QUERY_DEPOSITOPLAZO
+  url_host_queryDepositoPlazo: "webappspruebas.devbancoomeva.co"
+  url_port_queryDepositoPlazo: "80"
+  url_path_queryDepositoPlazo: "/TermDeposit/api/v3/Retrieve"
+  #URL SIMULAR_DEPOSITOPLAZO
+  url_host_simularDepositoPlazo: "webappspruebas.devbancoomeva.co"
+  url_port_simularDepositoPlazo: "80"
+  url_path_simularDepositoPlazo: "/TermDeposit/api/v3/CDT/Simulate"
+  #URL CREAR_CDT
+  url_host_crearCdt: "webappspruebas.devbancoomeva.co"
+  url_port_crearCdt: "80"
+  url_path_crearCdt: "/TermDeposit/api/v3/CDTCDAT/Initiate"
+  #CANONICALS-HEADER
+  orinatingBank: "Bancoomeva"
+  callBackUrl: "https://api.bancoomeva.com/callback"
+  channel: "0"
+  #CANONICALS-METADATA
+  priority: "high"
+  serviceLevelAgreement: "standard"
+  processingMode: "asynchronous"
+  #CANONICALS-CLIENTAPP
+  appName: "XPERT BUSINESS"
+  appVersion: "1.1.32"
+  #Activar Certificado
+  certificado_ssl: "0"

@@ -28,7 +28,7 @@ export const fn_orquestarSimulador = async (data) => {
       "paymentType": formaPago,
       "paymentFrequency": frecuenciaPago,
       "interestCompounded": capitalizaInteres === 0 ? false : true,
-      "amount": parseFloat(monto.replace(/\./g, '').replace(/[^\d]/g, '')).toFixed(2),
+      "amount": await prepararMonto(monto), //parseFloat(monto.replace(/\./g, '').replace(/[^\d]/g, '')).toFixed(2),
       "currencyCode": moneda,
       "termInDays": +plazo,
       "valueDate": fechaActivacion
@@ -63,4 +63,28 @@ export const fn_orquestarSimulador = async (data) => {
 
 async function fnDatosBasicos(pDataReques) {
   return JSON.parse(await fn_restSimularDepositoPlazo(JSON.stringify(pDataReques)));
+};
+
+
+async function prepararMonto(pMonto) {
+  pMonto = pMonto.replace(/[^\d.,]/g, '');
+  const montoSplit = pMonto.split('');
+  let controlIDX = 0;
+
+  for (const i of montoSplit) {
+    if (i === '.') {
+      montoSplit.splice(controlIDX, 1);
+    };
+    controlIDX = controlIDX + 1
+  };
+
+  pMonto = (montoSplit.join(''));
+  pMonto = pMonto.replace(',', '.');
+
+  const numero = parseFloat(pMonto);
+  if (isNaN(numero)) {
+    throw new Error('El monto no es válido.');
+  };
+
+  return pMonto;
 };

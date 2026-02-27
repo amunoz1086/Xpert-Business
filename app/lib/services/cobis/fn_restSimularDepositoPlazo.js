@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -38,6 +38,12 @@ async function fn_restSimularDepositoPlazo(dataReques) {
   const SIMULAR_DEPOSITOPLAZO_PORT = process.env.URL_PORT_SIMULAR_DEPOSITOPLAZO;
   const SIMULAR_DEPOSITOPLAZO_PATH = process.env.URL_PATH_SIMULAR_DEPOSITOPLAZO;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${SIMULAR_DEPOSITOPLAZO_HOST.trim()}${SIMULAR_DEPOSITOPLAZO_PORT ? `:${SIMULAR_DEPOSITOPLAZO_PORT.trim()}` : ''}${SIMULAR_DEPOSITOPLAZO_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
 
   let json_data = {};
@@ -60,7 +66,7 @@ async function fn_restSimularDepositoPlazo(dataReques) {
 
 
     let promise = new Promise(function (resolve, reject) {
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');               // decodifica directamente a string
         json_data.status = res.statusCode;
         let body = '';
@@ -153,6 +159,8 @@ async function fn_restSimularDepositoPlazo(dataReques) {
     return JSON.stringify(response_json_data);
 
   } catch (error) {
+    console.log(`❌ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
     console.error('❌ Error simulateCdt', error);
   };
 };

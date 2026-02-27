@@ -1,6 +1,6 @@
 DELIMITER $$
 	DROP PROCEDURE IF EXISTS queryAsignacionCuenta $$
-	CREATE PROCEDURE queryAsignacionCuenta(IN pNumeroCuenta VARCHAR(255))
+	CREATE PROCEDURE queryAsignacionCuenta(IN pNumeroCuenta VARCHAR(255), pActa VARCHAR(50))
 		BEGIN
 			SELECT 
 				A.cliente_id,
@@ -17,10 +17,10 @@ DELIMITER $$
 			FROM cupo_sobregiro AS A
 			JOIN Listas AS B ON B.lista = 'EstadoSobregiro' AND B.codLista = A.estado_solicitud
             JOIN usuario AS C ON C.USUARIO = A.usuario_radicador
-			WHERE A.numero_cuenta = pNumeroCuenta AND A.estado_solicitud = '40';
+			WHERE A.numero_cuenta = pNumeroCuenta AND A.acta_aprobacion_id = pActa AND A.estado_solicitud = '40';
 		END$$
 DELIMITER ;
 
-CALL queryAsignacionCuenta('10550000000015');
+CALL queryAsignacionCuenta('10550000000023');
 
 CALL queryAsignacionCuenta(?);

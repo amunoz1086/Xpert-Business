@@ -16,6 +16,17 @@ app.prepare().then(() => {
             const parsedUrl = parse(req.url, true);
             const { pathname, query } = parsedUrl;
 
+            // Detecta protocolo correctamente, incluso detrás de un proxy.
+            const proto =
+                req.headers['x-forwarded-proto']?.split(',')[0] ||
+                (req.socket.encrypted ? 'https' : 'http');
+
+            // Usa host del header (proxy-friendly)
+            const host = req.headers['x-forwarded-host'] || req.headers.host;
+
+            // Construye URL completa
+            const fullUrl = `${proto}://${host}${req.url}`;
+
             res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
             res.setHeader('X-Frame-Options', 'DENY');
             res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(), camera=(), fullscreen=(self)');
@@ -29,6 +40,7 @@ app.prepare().then(() => {
             }
 
             console.log(`Request processed: ${req.url}`);
+            console.log('Request URL:', fullUrl);
 
         } catch (err) {
             console.error(`internal server error: ${req.url} - ${err}`);

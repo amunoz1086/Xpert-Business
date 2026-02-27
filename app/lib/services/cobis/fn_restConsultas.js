@@ -1,9 +1,9 @@
-const https = require('https');
+const http = require('http');
 const keycloakqa = require('@/app/lib/services/keycloak/fn_restKeycloak');
 const { getSession } = require('@/app/lib/auth/auth');
 
 // Agent con keepAlive para reusar conexiones TLS
-const agent = new https.Agent({ keepAlive: true });
+const agent = new http.Agent({ keepAlive: true });
 
 let _cachedToken = null;
 let _expiresAt = 0;
@@ -32,6 +32,12 @@ async function postJson(host, port, path, payload, token) {
   const timeoutMs = 10000; // 10s timeout
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const PROTOCOL = (http ? 'http' : 'https');
+    const externalUrl = `${PROTOCOL}://${host.trim()}${port ? `:${port.trim()}` : ''}${path.trim()}`;
+
+    console.log(`✅ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
     try {
       return await new Promise((resolve, reject) => {
         const options = {
@@ -48,7 +54,7 @@ async function postJson(host, port, path, payload, token) {
           }
         };
 
-        const req = https.request(options, res => {
+        const req = http.request(options, res => {
           const buffers = [];
           res.on('data', chunk => buffers.push(chunk));
           res.on('end', () => {
@@ -74,6 +80,8 @@ async function postJson(host, port, path, payload, token) {
       });
 
     } catch (err) {
+      console.log(`❌ External API URL: ${externalUrl}`);
+      console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
       if (attempt === maxRetries) throw err;
       console.warn(`Attempt ${attempt} failed: ${err.message}, retrying...`);
       await sleep(100 * 2 ** (attempt - 1));

@@ -1,6 +1,6 @@
 /* MP: funcion para conectarse con la API consultarClienteJuridico para consultar Personas Juridicas */
 
-const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const bearerToken = require('../cognito/fn_restCognito');
 
@@ -30,7 +30,7 @@ async function fn_restConsultarClientePj(dataReques) {
     let response_json_data;
 
     let promise = new Promise(function (resolve, reject) {
-        const req = https.request(options, function (res) {
+        const req = http.request(options, function (res) {
             let chunks = [];
             json_data.status = res.statusCode;
 

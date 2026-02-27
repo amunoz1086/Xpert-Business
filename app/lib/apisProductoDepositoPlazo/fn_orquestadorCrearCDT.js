@@ -129,8 +129,26 @@ async function fnDatosBasicos(pDataReques, pFormasRecepcion, pRolesAsignados, pF
 
 
 function limpiarNumero(pValue) {
-  const numeroLimpio = pValue.replace(/\./g, '').replace(/[^\d]/g, '');
-  return parseFloat(numeroLimpio).toFixed(2);
+  pValue = pValue.replace(/[^\d.,]/g, '');
+  const montoSplit = pValue.split('');
+  let controlIDX = 0;
+
+  for (const i of montoSplit) {
+    if (i === '.') {
+      montoSplit.splice(controlIDX, 1);
+    };
+    controlIDX = controlIDX + 1
+  };
+
+  pValue = (montoSplit.join(''));
+  pValue = pValue.replace(',', '.');
+
+  const numero = parseFloat(pValue);
+  if (isNaN(numero)) {
+    throw new Error('El monto no es válido.');
+  };
+
+  return pValue;
 };
 
 

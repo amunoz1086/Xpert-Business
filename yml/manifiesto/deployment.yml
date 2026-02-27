@@ -1,0 +1,513 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: banca-comercial
+  name: apbancaemp-deployment
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: apbancaemp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: apbancaemp
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - image: 618817091491.dkr.ecr.us-east-1.amazonaws.com/apbancaemp:1.1.32
+        name: apbancaemp
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "2"
+            memory: "256Mi"
+          requests:
+            cpu: "0.5"
+            memory: "50Mi"
+        env:
+        - name: DB_USER_MYSQL #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: usuario_aurora
+        - name: DB_PASS_MYSQL #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: password_aurora
+        - name: DB_HOST_MYSQL #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: url_aurora
+        - name: DB_NAME_MYSQL #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: nombre_bd_aurora
+        - name: DB_PORT_MYSQL #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: puerto_bd_aurora
+        - name: SQUEMA_AURORA #DB
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: squema_aurora
+        - name: PORT # PUERTO DESPLIEGUE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_despliegue
+        - name: KEY_SECRET #AUTH APP
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: auth_app
+        - name: AUT_COGNITO_USU #AUTH COGNITO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: auth_cognito_usu
+        - name: AUT_COGNITO_PASS #AUTH COGNITO
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: auth_cognito_pass
+        - name: MAIL_HOST #EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_mail
+        - name: MAIL_PORT #EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_mail
+        - name: MAIL_SECURE #EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: ssl_tls_mail
+        - name: MAIL_USER #EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: usuario_mail
+        - name: MAIL_PASS #EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: password_mail
+        - name: URL_APP #URL APP
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_aplicacion
+        - name: URL_HOST_KNIME #URL KNIME
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_knime
+        - name: URL_PORT_KNIME #URL KNIME
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_knime
+        - name: URL_PATH_KNIME #URL KNIME
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_knime
+        - name: URL_HOST_COGNITO #URL COGNITO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_cognito
+        - name: URL_PATH_COGNITO #URL COGNITO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_cognito
+        - name: URL_HOST_PROFILE #URL PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_profile
+        - name: URL_PORT_PROFILE #URL PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_profile
+        - name: URL_PATH_PROFILE #URL PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_profile
+        - name: URL_HOST_CLIENTE #URL QUERY Cliente/Participantes
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_cliente
+        - name: URL_PORT_CLIENTE #URL QUERY Cliente/Participantes
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_cliente
+        - name: URL_PATH_CLIENTE #URL QUERY Cliente/Participantes
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_cliente
+        - name: URL_HOST_CATALOGO #URL CATALOGO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_catalogo
+        - name: URL_PORT_CATALOGO #URL CATALOGO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_catalogo
+        - name: URL_PATH_CATALOGO #URL CATALOGO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_catalogo
+        - name: URL_HOST_INSPEKTOR #URL INSPEKTOR
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_inspektor
+        - name: URL_PORT_INSPEKTOR #URL INSPEKTOR
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_inspektor
+        - name: URL_PATH_INSPEKTOR #URL INSPEKTOR
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_inspektor
+        - name: URL_HOST_CREAR_PARTICIPANTES_PJ #URL CREAR_PARTICIPANTES_PJ
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_crear_participantes_pj
+        - name: URL_PORT_CREAR_PARTICIPANTES_PJ #URL CREAR_PARTICIPANTES_PJ
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_crear_participantes_pj
+        - name: URL_PATH_CREAR_PARTICIPANTES_PJ #URL CREAR_PARTICIPANTES_PJ
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_crear_participantes_pj
+        - name: URL_HOST_CREAR_PARTICIPANTES_PN #URL CREAR_PARTICIPANTES_PN
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_crear_participantes_pn
+        - name: URL_PORT_CREAR_PARTICIPANTES_PN #URL CREAR_PARTICIPANTES_PN
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_crear_participantes_pn
+        - name: URL_PATH_CREAR_PARTICIPANTES_PN #URL CREAR_PARTICIPANTES_PN
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_crear_participantes_pn
+        - name: URL_HOST_CREAR_CLIENTES_PJ #URL CREAR_CLIENTE_PJ
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_crear_cliente_pj
+        - name: URL_PORT_CREAR_CLIENTES_PJ #URL CREAR_CLIENTE_PJ
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: puerto_crear_cliente_pj
+        - name: URL_PATH_CREAR_CLIENTES_PJ #URL CREAR_CLIENTE_PJ
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_crear_cliente_pj
+        - name: KEYCLOAK_TOKEN_HOST #URL KEYCLOAK
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: host_keycloak_token
+        - name: KEYCLOAK_TOKEN_PORT #URL KEYCLOAK
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: port_keycloak_token
+        - name: KEYCLOAK_TOKEN_PATH #URL KEYCLOAK
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_keycloak_token
+        - name: KEYCLOAK_GRANT_TYPE #AUTH KEYCLOAK
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: keycloak_grant_type
+        - name: KEYCLOAK_CLIENT_ID #AUTH KEYCLOAK
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: keycloak_cliente_id
+        - name: KEYCLOAK_CLIENT_SECRET #AUTH KEYCLOAK
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: keycloak_cliente_secret
+        - name: TIMEDOUT_lOGIN #TIMEDOUT
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: timedout_sesiones
+        - name: TIMEDOUT_SERVICES #TIMEDOUT
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: timedout_servicios
+        - name: TIMEDOUT_KNIME #TIMEDOUT
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: timedout_knime
+        - name: NEXT_PUBLIC_INACTIVITY_TIME #SESSION INACTIVITY
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: inactivity_time
+        - name: NEXT_PUBLIC_MODAL_DISPLAY_TIME #SESSION INACTIVITY
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: modal_display_time
+        - name: NEXT_PUBLIC_SESSION_EXPIRATION_TIME #SESSION INACTIVITY
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: session_expiration_time
+        - name: AWS_S3_REGION #BUCKET_S3
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: region_aws
+        - name: AWS_S3_BUCKET_NAME #BUCKET_S3
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: nombre_bucket
+        - name: AWS_S3_ACCESS_KEY_ID #AUTH BUCKET_S3
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: access_key_bucket
+        - name: AWS_S3_SECRET_ACCESS_KEY #AUTH BUCKET_S3
+          valueFrom:
+            secretKeyRef:
+              name: apbancaemp-secret
+              key: secret_access_bucket
+        - name: AWS_S3_PATH #BUCKET_S3
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: path_bucket
+        - name: URL_HOST_CREAR_CUENTASMAESTRAS #URL CREAR_CUENTASMAESTRAS
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_productoCaptacion
+        - name: URL_PORT_CREAR_CUENTASMAESTRAS #URL CREAR_CUENTASMAESTRAS
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_productoCaptacion
+        - name: URL_PATH_CREAR_CUENTASMAESTRAS #URL CREAR_CUENTASMAESTRAS
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_productoCaptacion
+        - name: URL_HOST_CUENTA_SOBREGIRO #URL CUENTA_SOBREGIRO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_cuentaSobregiro
+        - name: URL_PORT_CUENTA_SOBREGIRO #URL CUENTA_SOBREGIRO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_cuentaSobregiro
+        - name: URL_PATH_CUENTA_SOBREGIRO #URL CUENTA_SOBREGIRO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_cuentaSobregiro
+        - name: URL_HOST_ASIGNAR_SOBREGIRO #URL ASIGNAR_SOBREGIRO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_asignarSobregiro
+        - name: URL_PORT_ASIGNAR_SOBREGIRO #URL ASIGNAR_SOBREGIRO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_asignarSobregiro
+        - name: URL_PATH_ASIGNAR_SOBREGIRO #URL ASIGNAR_SOBREGIRO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_asignarSobregiro
+        - name: URL_HOST_CREAR_PAP #URL CREAR_PAP
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_crearPAP
+        - name: URL_PORT_CREAR_PAP #URL CREAR_PAP
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_crearPAP
+        - name: URL_PATH_CREAR_PAP #URL CREAR_PAP
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_crearPAP
+        - name: URL_HOST_ENVIAR_CORREO #URL ENVIAR_CORREO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_enviarCorreo
+        - name: URL_PORT_ENVIAR_CORREO #URL ENVIAR_CORREO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_enviarCorreo
+        - name: URL_PATH_ENVIAR_CORREO #URL ENVIAR_CORREO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_enviarCorreo
+        - name: URL_HOST_QUERY_CORTE #URL QUERY_CORTE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_queryCorte
+        - name: URL_PORT_QUERY_CORTE #URL QUERY_CORTE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_queryCorte
+        - name: URL_PATH_QUERY_CORTE #URL QUERY_CORTE
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_queryCorte
+        - name: URL_HOST_QUERY_DEPOSITOPLAZO #URL QUERY_DEPOSITOPLAZO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_queryDepositoPlazo
+        - name: URL_PORT_QUERY_DEPOSITOPLAZO #URL QUERY_DEPOSITOPLAZO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_queryDepositoPlazo
+        - name: URL_PATH_QUERY_DEPOSITOPLAZO #URL QUERY_DEPOSITOPLAZO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_queryDepositoPlazo
+        - name: URL_HOST_SIMULAR_DEPOSITOPLAZO #URL SIMULAR_DEPOSITOPLAZO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_simularDepositoPlazo
+        - name: URL_PORT_SIMULAR_DEPOSITOPLAZO #URL SIMULAR_DEPOSITOPLAZO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_simularDepositoPlazo
+        - name: URL_PATH_SIMULAR_DEPOSITOPLAZO #URL SIMULAR_DEPOSITOPLAZO
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_simularDepositoPlazo
+        - name: URL_HOST_CREAR_CDT #URL CREAR_CDT
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_host_crearCdt
+        - name: URL_PORT_CREAR_CDT #URL CREAR_CDT
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_port_crearCdt
+        - name: URL_PATH_CREAR_CDT #URL CREAR_CDT
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: url_path_crearCdt
+        - name: ORINATINGBANK #CANONICALS-HEADER
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: orinatingBank
+        - name: CALLBACKURL #CANONICALS-HEADER
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: callBackUrl
+        - name: CHANNEL #CANONICALS-HEADER
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: channel
+        - name: PRIORITY #CANONICALS-METADATA
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: priority
+        - name: SERVICELEVELAGREEMENT #CANONICALS-METADATA
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: serviceLevelAgreement
+        - name: PROCESSINGMODE #CANONICALS-METADATA
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: processingMode
+        - name: APPNAME #CANONICALS-CLIENTAPP
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: appName
+        - name: APPVERSION #CANONICALS-CLIENTAPP
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: appVersion
+        - name: NODE_TLS_REJECT_UNAUTHORIZED ##activar certificado
+          valueFrom:
+            configMapKeyRef:
+              name: apbancaemp-configmap
+              key: certificado_ssl
+        - name: SERVICIO_CORE
+          value: "apbancaemp"
+        - name: SERVICIO_MEDIACION
+          value: "apbancaemp"
+        - name: NIVEL_LOG
+          value: "3"
+        - name: TZ
+          value: "America/Bogota"

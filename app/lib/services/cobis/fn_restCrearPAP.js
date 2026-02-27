@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 const { getSession } = require('@/app/lib/auth/auth');
 const keycloakqa = require('@/app/lib/services/cognito/fn_restKeycloakqa');
@@ -47,6 +47,12 @@ async function fn_restCrearPAP(dataReques, propietarios) {
   const CREAR_PAP_PORT = process.env.URL_PORT_CREAR_PAP;
   const CREAR_PAP_PATH = process.env.URL_PATH_CREAR_PAP;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${CREAR_PAP_HOST.trim()}${CREAR_PAP_PORT ? `:${CREAR_PAP_PORT.trim()}` : ''}${CREAR_PAP_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
 
   let json_data = {};
@@ -71,7 +77,7 @@ async function fn_restCrearPAP(dataReques, propietarios) {
 
     let promise = new Promise(function (resolve, reject) {
 
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');               // decodifica directamente a string
         json_data.status = res.statusCode;
         let body = '';
@@ -179,6 +185,8 @@ async function fn_restCrearPAP(dataReques, propietarios) {
     return JSON.stringify(response_json_data);
 
   } catch (error) {
+    console.log(`❌ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
     console.error(error);
   };
 };

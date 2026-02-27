@@ -1,5 +1,5 @@
-const https = require('https');
-const keepAliveAgent = new https.Agent({ keepAlive: true });
+const http = require('http');
+const keepAliveAgent = new http.Agent({ keepAlive: true });
 const { randomUUID } = require('crypto');
 import { getSession } from '@/app/lib/auth/auth';
 
@@ -28,6 +28,12 @@ async function fn_restEnviarCorreo(dataReques) {
   const ENVIAR_CORREO_PORT = process.env.URL_PORT_ENVIAR_CORREO;
   const ENVIAR_CORREO_PATH = process.env.URL_PATH_ENVIAR_CORREO;
 
+  const PROTOCOL = (http ? 'http' : 'https');
+  const externalUrl = `${PROTOCOL}://${ENVIAR_CORREO_HOST.trim()}${ENVIAR_CORREO_PORT ? `:${ENVIAR_CORREO_PORT.trim()}` : ''}${ENVIAR_CORREO_PATH.trim()}`;
+
+  console.log(`✅ External API URL: ${externalUrl}`);
+  console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
+
   const { access_token, token_type } = await getAccessToken();
   const usuario = (await getSession()).userBACK.user;
 
@@ -52,7 +58,7 @@ async function fn_restEnviarCorreo(dataReques) {
 
 
     let promise = new Promise(function (resolve, reject) {
-      const req = https.request(options, res => {
+      const req = http.request(options, res => {
         res.setEncoding('utf8');               // decodifica directamente a string
         json_data.status = res.statusCode;
         let body = '';
@@ -129,6 +135,8 @@ async function fn_restEnviarCorreo(dataReques) {
     return JSON.stringify(response_json_data);
 
   } catch (error) {
+    console.log(`❌ External API URL: ${externalUrl}`);
+    console.log(`➡️ Protocol detected (by module): ${PROTOCOL.toUpperCase()}`);
     console.error(error);
   };
 };
